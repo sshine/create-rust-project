@@ -1,0 +1,13 @@
+{
+  "name": "new-rust-project",
+  "description": "Interactively scaffold new Rust projects with opinionated defaults: workspace or single-crate, Nix integration, error handling, CI, and more",
+  "version": "1.0.0",
+  "author": {
+    "name": "sshine",
+    "url": "https://github.com/sshine"
+  },
+  "homepage": "https://github.com/sshine/create-rust-project",
+  "repository": "https://github.com/sshine/create-rust-project",
+  "license": "MIT",
+  "keywords": ["rust", "scaffolding", "nix", "workspace", "project-template"]
+}

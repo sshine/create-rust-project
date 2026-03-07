@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "sshine-create-rust-project",
+  "description": "Interactively scaffold new Rust projects with opinionated defaults: workspace or single-crate, Nix integration, error handling, CI, and more",
+  "owner": {
+    "name": "sshine",
+    "email": ""
+  },
+  "plugins": [
+    {
+      "name": "new-rust-project",
+      "description": "Scaffold a new Rust project. Use when the user wants to create a new Rust project, crate, or workspace. Asks about project type, Nix integration, error handling, dependencies, CI, and license, then generates all files.",
+      "version": "1.0.0",
+      "author": {
+        "name": "sshine"
+      },
+      "source": "./plugins/new-rust-project",
+      "category": "development",
+      "homepage": "https://github.com/sshine/create-rust-project"
+    }
+  ]
+}
