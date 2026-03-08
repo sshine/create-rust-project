@@ -14,86 +14,179 @@ You are scaffolding a new Rust project. Follow these steps exactly.
 
 ## Step 1: Ask Questions
 
-Ask the following questions **sequentially** using `AskUserQuestion`. Do not ask all at once.
+**You MUST call the `AskUserQuestion` tool for EACH question below. Do NOT skip questions or assume answers. Wait for the user's response before proceeding to the next question.**
 
-### Q1: Project Name
+Before starting, detect the current directory name and run `git config user.name` to get the GitHub username default.
 
-Ask for the project name. Default: `$ARGUMENTS` if provided, otherwise the current directory name.
-Validate: must be lowercase ASCII letters, digits, and hyphens only. Must start with a letter.
+---
 
-### Q2: Project Type
+### Q1: Project Name — `header: "Name"`
 
-Options:
-- **Workspace** (recommended) — multi-crate workspace with `crates/` directory
-- **Binary** — single crate with `src/main.rs`
-- **Library** — single crate with `src/lib.rs`
+Determine the default name: use `$ARGUMENTS` if provided and valid (lowercase ASCII letters, digits, hyphens; must start with a letter), otherwise use the current directory name.
 
-Default: Workspace
+Call `AskUserQuestion` with:
+- `header`: `"Name"`
+- `question`: `"What should the project be called?"`
+- `multiSelect`: `false`
+- `options`:
+  - If `$ARGUMENTS` is provided and valid:
+    - label: `"Use \"<argument>\""`, description: `"From command arguments"`
+    - label: `"Use \"<dirname>\""`, description: `"From current directory name"`
+  - If `$ARGUMENTS` is not provided or invalid:
+    - label: `"Use \"<dirname>\""`, description: `"From current directory name"`
+    - label: `"Enter custom name"`, description: `"Type a project name (lowercase, hyphens ok)"`
 
-If workspace is chosen, ask a follow-up:
+The user may also select "Other" to type a custom name. Validate: lowercase ASCII letters, digits, hyphens; must start with a letter.
 
-#### Q2b: Initial Crate Names
+**STOP and WAIT for the user's response before continuing.**
 
-Suggest `<name>-core` and `<name>-cli` as defaults. Allow the user to customize.
-Each crate name must follow the same naming rules as the project name.
-Ask which crates should be libraries vs binaries (default: all libraries except `*-cli` which is binary).
+---
 
-### Q3: Short Description
+### Q2: Project Type — `header: "Type"`
 
-Ask for a one-line description for `Cargo.toml` and `README.md`.
+Call `AskUserQuestion` with:
+- `header`: `"Type"`
+- `question`: `"What type of Rust project?"`
+- `multiSelect`: `false`
+- `options`:
+  - label: `"Workspace (Recommended)"`, description: `"Multi-crate workspace with crates/ directory"`
+  - label: `"Binary"`, description: `"Single crate with src/main.rs"`
+  - label: `"Library"`, description: `"Single crate with src/lib.rs"`
 
-### Q4: Nix Integration
+**STOP and WAIT for the user's response before continuing.**
 
-Options:
-- **Full flake.nix** with flake-parts, treefmt-nix, crate2nix, rust-overlay (recommended)
-- **Simple shell.nix** — rustup-based, minimal Nix support
-- **None** — no Nix files
+---
 
-Default: Full flake.nix
+### Q2b: Initial Crate Names (only if Workspace was chosen) — `header: "Crates"`
 
-If flake is chosen, there should be a .envrc file containing "use flake".
+Compute defaults: `<name>-core` (library) and `<name>-cli` (binary).
 
-If simple Nix is chosen, there should be a .envrc file containing "use nix".
+Call `AskUserQuestion` with:
+- `header`: `"Crates"`
+- `question`: `"Which crates should the workspace contain?"`
+- `multiSelect`: `false`
+- `options`:
+  - label: `"<name>-core + <name>-cli"`, description: `"Core library and CLI binary (default)"`
+  - label: `"<name>-core only"`, description: `"Just the core library crate"`
+  - label: `"<name>-cli only"`, description: `"Just the CLI binary crate"`
 
-### Q5: Error Handling
+The user may select "Other" to specify custom crate names (comma-separated). Each crate name must follow the same naming rules as the project name. Crates ending in `-cli` are binaries; all others are libraries.
 
-Options:
-- **thiserror** (recommended) — derive macro for custom error enums; generates `src/error.rs` with `Error` enum and `Result<T>` alias
-- **anyhow** — convenient boxed errors for applications; no `src/error.rs` generated
+**STOP and WAIT for the user's response before continuing.**
 
-Default: thiserror
+---
 
-### Q6: Dev Dependencies (multi-select)
+### Q3: Short Description — `header: "Description"`
 
-The following are always included (do not ask):
-- `serde` (+ `serde_json`) — serialization
-- `tracing` — structured diagnostics
+Compute a default description based on project type, e.g. `"A Rust workspace"`, `"A Rust CLI application"`, or `"A Rust library"`.
 
-Options to ask about:
-- **insta** — snapshot testing (default: selected)
-- **proptest** — property-based testing
-- **criterion** — benchmarking
-- **clap** — CLI argument parsing (suggest for binary crates)
-- **tokio** — async runtime
+Call `AskUserQuestion` with:
+- `header`: `"Description"`
+- `question`: `"One-line project description for Cargo.toml and README?"`
+- `multiSelect`: `false`
+- `options`:
+  - label: `"<default description>"`, description: `"Auto-generated based on project type"`
+  - label: `"Enter custom description"`, description: `"Type your own description"`
 
-### Q7: CI (multi-select)
+The user may select "Other" to type a custom description.
 
-Options:
-- **GitHub Actions** (default: selected)
-- **Lefthook** (default: selected)
+**STOP and WAIT for the user's response before continuing.**
 
-### Q8: License (multi-select)
+---
 
-Options:
-- **MIT** (default: selected)
-- **Apache-2.0**
-- **LGPL 3.0**
+### Q4: Nix Integration — `header: "Nix"`
+
+Call `AskUserQuestion` with:
+- `header`: `"Nix"`
+- `question`: `"What level of Nix integration?"`
+- `multiSelect`: `false`
+- `options`:
+  - label: `"Full flake.nix (Recommended)"`, description: `"flake-parts, treefmt-nix, crate2nix, rust-overlay"`
+  - label: `"Simple shell.nix"`, description: `"Minimal rustup-based Nix shell"`
+  - label: `"None"`, description: `"No Nix files"`
+
+If flake is chosen, generate a `.envrc` file containing `use flake`.
+If simple Nix is chosen, generate a `.envrc` file containing `use nix`.
+
+**STOP and WAIT for the user's response before continuing.**
+
+---
+
+### Q5: Error Handling — `header: "Errors"`
+
+Call `AskUserQuestion` with:
+- `header`: `"Errors"`
+- `question`: `"Which error handling approach?"`
+- `multiSelect`: `false`
+- `options`:
+  - label: `"thiserror (Recommended)"`, description: `"Derive macro for custom error enums; generates src/error.rs"`
+  - label: `"anyhow"`, description: `"Convenient boxed errors for applications; no error.rs"`
+
+**STOP and WAIT for the user's response before continuing.**
+
+---
+
+### Q6: Extra Dependencies — `header: "Extras"`, `multiSelect: true`
+
+The following are always included (do not ask): `serde` (+ `serde_json`), `tracing`.
+
+Call `AskUserQuestion` with:
+- `header`: `"Extras"`
+- `question`: `"Which additional dependencies do you want? (serde, tracing always included)"`
+- `multiSelect`: `true`
+- `options`:
+  - label: `"insta"`, description: `"Snapshot testing"`
+  - label: `"proptest"`, description: `"Property-based testing"`
+  - label: `"criterion"`, description: `"Benchmarking"`
+  - label: `"clap"`, description: `"CLI argument parsing"`
+  - label: `"tokio"`, description: `"Async runtime"`
+
+**STOP and WAIT for the user's response before continuing.**
+
+---
+
+### Q7 + Q8: CI and License — asked together in one `AskUserQuestion` call
+
+Call `AskUserQuestion` with **two questions** in a single call:
+
+**Question 1:**
+- `header`: `"CI"`
+- `question`: `"Which CI/tooling integrations?"`
+- `multiSelect`: `true`
+- `options`:
+  - label: `"GitHub Actions"`, description: `"CI workflow in .github/workflows/"`
+  - label: `"Lefthook"`, description: `"Git hooks manager for pre-commit checks"`
+
+**Question 2:**
+- `header`: `"License"`
+- `question`: `"Which license(s)?"`
+- `multiSelect`: `true`
+- `options`:
+  - label: `"MIT"`, description: `"Permissive, simple"`
+  - label: `"Apache-2.0"`, description: `"Permissive with patent grant"`
+  - label: `"LGPL-3.0"`, description: `"Copyleft for libraries"`
 
 If multiple licenses are selected, provide multiple aptly named license files.
 
-### Q9: GitHub Username
+**STOP and WAIT for the user's response before continuing.**
 
-Default: Current system user.
+---
+
+### Q9: GitHub Username — `header: "GitHub"`
+
+Use the value from `git config user.name` (detected earlier) as the default. If unavailable, fall back to the system username.
+
+Call `AskUserQuestion` with:
+- `header`: `"GitHub"`
+- `question`: `"What is your GitHub username (for CI and README badges)?"`
+- `multiSelect`: `false`
+- `options`:
+  - label: `"Use \"<detected-name>\""`, description: `"Detected from git config"`
+  - label: `"Enter different username"`, description: `"Type your GitHub username"`
+
+The user may select "Other" to type a custom username.
+
+**STOP and WAIT for the user's response before continuing.**
 
 ## Step 2: Confirm
 
